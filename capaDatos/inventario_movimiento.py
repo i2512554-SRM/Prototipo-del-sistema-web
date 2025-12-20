@@ -27,7 +27,7 @@ class DInventario:
             self.__db
             .table(self.__nombretabla)
             .update(datos)
-            .eq('id', id_movimiento)
+            .eq('id_movimiento', id_movimiento)
         )
         return self.__ejecutarConsulta(consulta)
 
@@ -36,6 +36,6 @@ class DInventario:
             self.__db
             .table(self.__nombretabla)
             .delete()
-            .eq('id', id_movimiento)
+            .eq('id_movimiento', id_movimiento)
         )
         return self.__ejecutarConsulta(consulta)

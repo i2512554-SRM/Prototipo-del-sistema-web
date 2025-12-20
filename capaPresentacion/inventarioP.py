@@ -15,9 +15,9 @@ class PInventario:
             st.subheader("Inventario")
             st.dataframe(movimientos)
 
-            ids = [m["id"] for m in movimientos]
+            ids = [m["id_movimiento"] for m in movimientos]
             id_seleccionado = st.selectbox("Seleccionar ID movimiento", ids)
-            movimiento_sel = next(m for m in movimientos if m["id"] == id_seleccionado)
+            movimiento_sel = next(m for m in movimientos if m["id_movimiento"] == id_seleccionado)
         else:
             movimiento_sel = None
 
@@ -67,10 +67,10 @@ class PInventario:
                 st.toast("Movimiento registrado")
 
             if btnActualizar and movimiento_sel:
-                self.lInventario.actualizarMovimientoInventario(movimiento_sel["id"], movimiento)
+                self.lInventario.actualizarMovimientoInventario(movimiento_sel["id_movimiento"], movimiento)
                 st.toast("Movimiento actualizado")
 
             if btnEliminar and movimiento_sel:
-                self.lInventario.eliminarMovimientoInventario(movimiento_sel["id"])
+                self.lInventario.eliminarMovimientoInventario(movimiento_sel["id_movimiento"])
                 st.toast("Movimiento eliminado")
 

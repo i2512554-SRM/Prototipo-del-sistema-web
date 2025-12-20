@@ -15,3 +15,12 @@ class LInventario:
             return "ERROR: Tipo de movimiento inválido"
 
         return self.dInventario.insertarMovimientoInventario(movimiento)
+
+    def actualizarMovimientoInventario(self, id_movimiento: int, movimiento: dict):
+        if movimiento["cantidad"] <= 0:
+            return "ERROR: La cantidad debe ser mayor a 0"
+
+        return self.dInventario.actualizarMovimientoInventario(id_movimiento, movimiento)
+
+    def eliminarMovimientoInventario(self, id_movimiento: int):
+        return self.dInventario.eliminarMovimientoInventario(id_movimiento)

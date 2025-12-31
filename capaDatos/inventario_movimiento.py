@@ -13,11 +13,29 @@ class DInventario:
                 return consulta.execute()
         except Exception as e:
             return f'ERROR: {e}'
-
+        
     def mostrarMovimientosInventario(self):
         consulta = self.__db.table(self.__nombretabla).select('*')
         return self.__ejecutarConsulta(consulta, 'SELECT')
-
+    
     def insertarMovimientoInventario(self, movimiento: dict):
         consulta = self.__db.table(self.__nombretabla).insert(movimiento)
+        return self.__ejecutarConsulta(consulta)
+
+    def actualizarMovimientoInventario(self, id_movimiento: int, datos: dict):
+        consulta = (
+            self.__db
+            .table(self.__nombretabla)
+            .update(datos)
+            .eq('id_movimiento', id_movimiento)
+        )
+        return self.__ejecutarConsulta(consulta)
+
+    def eliminarMovimientoInventario(self, id_movimiento: int):
+        consulta = (
+            self.__db
+            .table(self.__nombretabla)
+            .delete()
+            .eq('id_movimiento', id_movimiento)
+        )
         return self.__ejecutarConsulta(consulta)

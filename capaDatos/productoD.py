@@ -47,3 +47,6 @@ class DProductos:
 
         return self.__ejecutarConsulta(consulta)
 
+    def mostrarProductos(self):
+        resultado = self.__db.table("productos").select("*").execute()
+        return resultado.data  

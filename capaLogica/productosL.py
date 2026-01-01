@@ -3,6 +3,7 @@ from capaDatos.productoD import DProductos
 
 class LProductos:
     def __init__(self):
+        print("Cargando LProductos actualizado")
         self.dProductos = DProductos()
 
 #Esto es para que solo puedan escribir texto 
@@ -61,3 +62,12 @@ class LProductos:
         return self.dProductos.actualizarProducto(
             id_producto, nombre, precio, stock, categoria, unidad, estado
         )
+    def listarProductos(self):
+        productos = self.dProductos.mostrarProductos()
+        return [dict(p) for p in productos]
+
+"""  
+    def listarProductos(self):
+        productos = self.dProductos.mostrarProductos()
+        return productos if productos else []
+"""""

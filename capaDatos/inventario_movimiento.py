@@ -22,7 +22,7 @@ class DInventario:
         consulta = self.__db.table(self.__nombretabla).insert(movimiento)
         return self.__ejecutarConsulta(consulta)
 
-    def actualizarMovimientoInventario(self, id_movimiento: int, datos: dict):
+    def actualizarMovimientoInventario(self, id_mov: int, datos: dict):
         consulta = (
             self.__db
             .table(self.__nombretabla)
@@ -31,7 +31,7 @@ class DInventario:
         )
         return self.__ejecutarConsulta(consulta)
 
-    def eliminarMovimientoInventario(self, id_movimiento: int):
+    def eliminarMovimientoInventario(self, id_mov: int):
         consulta = (
             self.__db
             .table(self.__nombretabla)

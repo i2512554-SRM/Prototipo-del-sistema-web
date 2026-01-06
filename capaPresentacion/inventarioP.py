@@ -287,15 +287,38 @@ class PInventario:
             st.rerun()
 """
 from capaLogica.inventarioL import LInventario
+from capaLogica.productosL import LProductos
 import streamlit as st
+from datetime import date
+
 
 class PInventario:
     def __init__(self):
         self.lInventario = LInventario()
+        self.lProductos = LProductos()
         self.construirInterfaz()
 
     def construirInterfaz(self):
         st.title("Movimientos de Inventario")
+
+        # =======================
+        # Selección de producto (OBLIGATORIA)
+        # =======================
+        productos = self.lProductos.listarProductos()
+
+        if not productos:
+            st.warning("No hay productos registrados")
+            return
+
+        opciones_productos = [
+            f"{p['id_producto']} - {p['nombre']}" for p in productos
+        ]
+
+        producto_seleccionado = st.selectbox(
+            "Seleccionar Producto", opciones_productos
+        )
+
+        id_producto = int(producto_seleccionado.split(" - ")[0])
 
         # =======================
         # Mostrar movimientos
@@ -304,41 +327,44 @@ class PInventario:
 
         movimiento_sel = None
         if movimientos:
-            st.subheader("Listado de Movimientos")
+            st.subheader("Inventario")
             st.dataframe(movimientos)
 
             ids = [m["id_mov"] for m in movimientos]
-            id_seleccionado = st.selectbox("Seleccionar ID del movimiento", ids)
+            id_seleccionado = st.selectbox(
+                "Seleccionar ID movimiento", ids
+            )
 
             movimiento_sel = next(
                 (m for m in movimientos if m["id_mov"] == id_seleccionado),
                 None
             )
-        else:
-            st.info("No hay movimientos registrados")
 
         # =======================
         # Formulario
         # =======================
-        recargar = False  # 🔑 control del rerun
-
         with st.form("form_inventario"):
             tipo = st.selectbox("Tipo", ["entrada", "salida"])
             cantidad = st.number_input("Cantidad", min_value=1, value=1)
-            costo = st.number_input("Costo unitario", min_value=0.0)
+            costo = st.number_input("Costo unitario", min_value=0.0, value=0.0)
             descripcion = st.text_area("Descripción")
-            id_usuario = st.number_input("ID Usuario", min_value=1)
+            id_usuario = st.number_input("ID Usuario", min_value=1, value=1)
 
             btnGuardar = st.form_submit_button("Registrar")
             btnActualizar = st.form_submit_button("Actualizar")
             btnEliminar = st.form_submit_button("Eliminar")
 
+            # 🔹 FECHA AUTOMÁTICA
+            fecha_actual = date.today().isoformat()
+
             movimiento = {
+                "id_producto": id_producto,
                 "tipo": tipo,
                 "cantidad": cantidad,
                 "costo_unitario": costo,
                 "descripcion": descripcion,
-                "id_usuario": id_usuario
+                "id_usuario": id_usuario,
+                "fecha": fecha_actual
             }
 
             # =======================
@@ -346,52 +372,28 @@ class PInventario:
             # =======================
             if btnGuardar:
                 resultado = self.lInventario.insertarMovimientoInventario(movimiento)
-
                 if isinstance(resultado, str) and "ERROR" in resultado:
                     st.error(resultado)
                 else:
                     st.success("Movimiento registrado correctamente")
-                    recargar = True
+                    st.rerun()
 
             # =======================
             # Actualizar
             # =======================
-            if btnActualizar:
-                if not movimiento_sel:
-                    st.warning("Seleccione un movimiento para actualizar")
-                else:
-                    resultado = self.lInventario.actualizarMovimientoInventario(
-                        movimiento_sel["id_mov"],
-                        movimiento
-                    )
-
-                    if isinstance(resultado, str) and "ERROR" in resultado:
-                        st.error(resultado)
-                    else:
-                        st.success("Movimiento actualizado correctamente")
-                        recargar = True
+            if btnActualizar and movimiento_sel:
+                self.lInventario.actualizarMovimientoInventario(
+                    movimiento_sel["id_mov"], movimiento
+                )
+                st.success("Movimiento actualizado")
+                st.rerun()
 
             # =======================
             # Eliminar
             # =======================
-            if btnEliminar:
-                if not movimiento_sel:
-                    st.warning("Seleccione un movimiento para eliminar")
-                else:
-                    resultado = self.lInventario.eliminarMovimientoInventario(
-                        movimiento_sel["id_mov"]
-                    )
-
-                    # 🔴 Si la lógica bloquea por stock
-                    if isinstance(resultado, str) and "ERROR" in resultado:
-                        st.error(resultado)
-                    else:
-                        st.success("Movimiento eliminado correctamente")
-                        recargar = True
-
-        # =======================
-        # Rerun controlado
-        # =======================
-        if recargar:
-            st.rerun()
-
+            if btnEliminar and movimiento_sel:
+                self.lInventario.eliminarMovimientoInventario(
+                    movimiento_sel["id_mov"]
+                )
+                st.success("Movimiento eliminado")
+                st.rerun()
